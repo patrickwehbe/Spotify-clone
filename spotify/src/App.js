@@ -43,17 +43,17 @@ function App() {
     <div className="app">
       
       {
-        <>
+        
         token ? ( 
           
           <Player spotify={spotify} />
-          <h1>player</h1>
+         
         ) : (
           <Login />
          
         )
        
-        </>
+        
       }
      
       
