@@ -4,7 +4,7 @@ import './Player.css'
 function Player({spotify}) {
     return (
         <div className="player">
-            <h1>player</h1>
+           <div className="player__body"></div>
         </div>
     )
 }
