@@ -35,28 +35,28 @@ function App() {
               })
 
             });
+
+            spotify.getUserPlaylists().then((playlists) =>{
+              dispatch({
+                type: "SET_PLAYLISTS",
+                playlists: playlists
+              })
+            })
         }
-      console.log(user)
+    
 
     },[])
   return (
     <div className="app">
-      
       {
-        
         token ? ( 
-          
           <Player spotify={spotify} />
          
         ) : (
           <Login />
          
         )
-       
-        
       }
-     
-      
     </div>
     
   );
