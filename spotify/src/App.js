@@ -41,11 +41,17 @@ function App() {
                 type: "SET_PLAYLISTS",
                 playlists: playlists
               })
-            })
-        }
+            });
+            spotify.getPlaylist('3aeeb5e194bf4572977b9b8ec296fda0').then((response) =>{
+              dispatch({
+                type: "SET_DISCOVER_WEEKLY",
+                discover_weekly: response,
+              })
+            });
+          }
     
 
-    },[])
+    }, []);
   return (
     <div className="app">
       {
