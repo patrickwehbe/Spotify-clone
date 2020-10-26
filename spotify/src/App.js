@@ -1,70 +1,70 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import Login from './Login';
-import { getTokenFromUrl } from './spotify';
-import SpotifyWebApi from 'spotify-web-api-js'
-import Player from './Player';
-import {useDataLayerValue} from './DataLayer'
+import React, { useEffect } from "react";
+import SpotifyWebApi from "spotify-web-api-js";
+import { useStateValue } from "./StateProvider";
+import Player from "./Player";
+import { getTokenFromResponse } from "./spotify";
+import "./App.css";
+import Login from "./Login";
 
-const spotify = new SpotifyWebApi();
+const s = new SpotifyWebApi();
 
 function App() {
-   
-    const [{user, token}, dispatch] = useDataLayerValue();
+  const [{ token }, dispatch] = useStateValue();
 
-    useEffect(() =>{
-        const hash = getTokenFromUrl();
-        window.location.hash = "";
-        const _token = hash.access_token;
+  useEffect(() => {
+    // Set token
+    const hash = getTokenFromResponse();
+    window.location.hash = "";
+    let _token = hash.access_token;
 
-        if(_token){
+    if (_token) {
+      s.setAccessToken(_token);
 
-            dispatch({
-              type: 'SET_TOKEN',
-              token: _token
+      dispatch({
+        type: "SET_TOKEN",
+        token: _token,
+      });
 
-            })
+      s.getPlaylist("4bTciDeq3gdkqcuaGNuBJ7").then((response) =>
+        dispatch({
+          type: "SET_DISCOVER_WEEKLY",
+          discover_weekly: response,
+        })
+      );
 
-            spotify.setAccessToken(_token);
-            spotify.getMe().then(user =>{
-    
-              dispatch({
-                type: 'SET_USER',
-                user : user
+      s.getMyTopArtists().then((response) =>
+        dispatch({
+          type: "SET_TOP_ARTISTS",
+          top_artists: response,
+        })
+      );
 
-              })
+      dispatch({
+        type: "SET_SPOTIFY",
+        spotify: s,
+      });
 
-            });
+      s.getMe().then((user) => {
+        dispatch({
+          type: "SET_USER",
+          user,
+        });
+      });
 
-            spotify.getUserPlaylists().then((playlists) =>{
-              dispatch({
-                type: "SET_PLAYLISTS",
-                playlists: playlists
-              })
-            });
-            spotify.getPlaylist('3aeeb5e194bf4572977b9b8ec296fda0').then((response) =>{
-              dispatch({
-                type: "SET_DISCOVER_WEEKLY",
-                discover_weekly: response,
-              })
-            });
-          }
-    
+      s.getUserPlaylists().then((playlists) => {
+        dispatch({
+          type: "SET_PLAYLISTS",
+          playlists,
+        });
+      });
+    }
+  }, [token, dispatch]);
 
-    }, []);
   return (
     <div className="app">
-      {
-        token ? ( 
-          <Player spotify={spotify} />
-         
-        ) : (
-          <Login />
-         
-        )
-      }
+      {!token && <Login />}
+      {token && <Player spotify={s} />}
     </div>
-    
   );
 }
 
